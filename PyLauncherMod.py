@@ -11,11 +11,11 @@ from threading import Thread
 import time
 
 uid = ''
-def save(uname='noname', cpath='', jpath='', maxmb=1600):
+lst = {}
+path = str(sp.check_output("cd", shell=True))[2:-5].replace(r'\\','\\')
+def save(uname='none', cpath=path, jpath=path, maxmb=1600, uid=str(uuid.uuid1()).replace('-','')):
 	global lst
-	global uid
-	if uid == '': uid = str(uuid.uuid1()).replace('-','')
-
+	
 	lst = {
 		"username" :    uname,
 		"clentpath" :   cpath,
@@ -35,7 +35,7 @@ def save(uname='noname', cpath='', jpath='', maxmb=1600):
 		file.close()
 
 # открыть джисон файл
-lst = {}
+
 config = "PyConfig.json"
 try:
 	file = open(config, 'r')
@@ -65,8 +65,7 @@ def path(string, string2, row):
 	Label(text=string2, font="Arial 12").grid(row=row, column=0, pady=10, padx=10)
 
 	var = StringVar()
-	if lst == {} or lst[string] == '': var.set(str(sp.check_output("cd", shell=True))[2:-5].replace(r'\\','\\'))
-	else: var.set(lst[string])
+	var.set(lst[string])
 
 	def func():
 		dirname = filedialog.askdirectory(initialdir=var.get())
@@ -82,9 +81,7 @@ javapath  = path('javapath',  "Путь на папку джава: ",  2)  # 3-
 
 def mbandname(string, string2, default, row):
 		var = StringVar()
-
-		if lst == {} or lst[string] == '': var.set(default)
-		else: var.set(lst[string])
+		var.set(lst[string])
 
 		Label(text=string2, font="Arial 12").grid(row=row, column=0, pady=10, padx=10)
 		Entry(width=25, textvariable=var).grid(row=row, column=1, pady=10, padx=10)
@@ -94,10 +91,13 @@ maxmb    = mbandname('maxmb',    "Память: ",     '1600',   3) # 3-ый с�
 username = mbandname('username', "Имя игрока: ", 'noname', 4) # 4-ый строка
 
 # 6-ой строка
-Button(text="Сохранения",  width=12, height=1, command=lambda:save()).grid(row=5, column=0, pady=10, padx=10)
+def save2():
+	save(username.get(), clentpath.get(), javapath.get(), maxmb.get(), uid)
+btt = Button(text="Сохранения",  width=12, height=1, command=save2)
+btt.grid(row=5, column=0, pady=10, padx=10)
 
 def start(obj):
-	save(username.get(), clentpath.get(), javapath.get(), maxmb.get(), uid)
+	save2()
 	text = f"""{lst['javapath']}\\bin\\javaw.exe 
 -XX:+UseConcMarkSweepGC 
 -XX:-UseAdaptiveSizePolicy 
