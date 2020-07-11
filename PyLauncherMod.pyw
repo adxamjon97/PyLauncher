@@ -13,7 +13,7 @@ import uuid
 import subprocess as sp
 
 lst = {}
-config = "PyConfig1.json"
+config = "PyConfig.json"
 try:
 	file = open(config, 'r')
 	lst = json.loads(''.join([line for line in file]))
