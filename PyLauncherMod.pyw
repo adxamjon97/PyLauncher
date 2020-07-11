@@ -1,10 +1,3 @@
-# username  = "warlok"
-# clentpath = "d:\\adxamjon2\\o'yin\\minecraft\\minecraft_1.7.10_Mod\\client"
-# javapath  = "d:\\adxamjon2\\o'yin\\minecraft\\jre1.8.0_25"
-# maxmb     = "1600"
-# uuid        = "b45fc7b6f6e239b9a6558323c54644af"
-# accessToken = "b45fc7b6f6e239b9a6558323c54644af"
-# scobe = r'{}'
 from tkinter import *
 from tkinter import filedialog
 
