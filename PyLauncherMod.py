@@ -1,6 +1,7 @@
+# hiddenimports=['tkinter', 'json', 'uuid', 'subprocess', 'threading','time']
+
 from tkinter import *
 from tkinter import filedialog
-# from PIL import ImageTk,Image
 
 import json
 import uuid
@@ -9,17 +10,40 @@ import subprocess as sp
 from threading import Thread
 import time
 
+uid = ''
+def save(uname='noname', cpath='', jpath='', maxmb=1600):
+	global lst
+	global uid
+	if uid == '': uid = str(uuid.uuid1()).replace('-','')
+
+	lst = {
+		"username" :    uname,
+		"clentpath" :   cpath,
+		"javapath" :    jpath,
+		"maxmb" :       maxmb,
+		"uuid" :        uid,
+		"accessToken" : uid,
+		"scobe" :       r'{}'
+	}
+
+	try:
+		file = open(config, 'w')
+		file.write(json.dumps(lst))
+	except Exception as e:
+		print('error of dumps')
+	finally:
+		file.close()
+
 # открыть джисон файл
 lst = {}
 config = "PyConfig.json"
 try:
 	file = open(config, 'r')
 	lst = json.loads(''.join([line for line in file])) # взять как славарь
-except Exception as e:
-	file = open(config, 'w') # если нет то заздадим
-	file.write = r'w'
-finally:
 	file.close()
+except Exception as e:
+	save()
+	
 
 # начать рисовать на окно
 root = Tk()
@@ -41,7 +65,7 @@ def path(string, string2, row):
 	Label(text=string2, font="Arial 12").grid(row=row, column=0, pady=10, padx=10)
 
 	var = StringVar()
-	if lst == {} or lst[string] == '': var.set(sp.check_output("cd", shell=True))
+	if lst == {} or lst[string] == '': var.set(str(sp.check_output("cd", shell=True))[2:-5].replace(r'\\','\\'))
 	else: var.set(lst[string])
 
 	def func():
@@ -70,31 +94,10 @@ maxmb    = mbandname('maxmb',    "Память: ",     '1600',   3) # 3-ый с�
 username = mbandname('username', "Имя игрока: ", 'noname', 4) # 4-ый строка
 
 # 6-ой строка
-def save():
-	global lst
-	uid = str(uuid.uuid1()).replace('-','')
-	lst = {
-		"username" :    username.get(),
-		"clentpath" :   clentpath.get(),
-		"javapath" :    javapath.get(),
-		"maxmb" :       maxmb.get(),
-		"uuid" :        uid,
-		"accessToken" : uid,
-		"scobe" :       r'{}'
-	}
-
-	try:
-		file = open(config, 'w')
-		file.write(json.dumps(lst))
-	except Exception as e:
-		print('error of dumps')
-	finally:
-		file.close()
-
-Button(text="Сохранения",  width=12, height=1, command=save).grid(row=5, column=0, pady=10, padx=10)
+Button(text="Сохранения",  width=12, height=1, command=lambda:save()).grid(row=5, column=0, pady=10, padx=10)
 
 def start(obj):
-	save()
+	save(username.get(), clentpath.get(), javapath.get(), maxmb.get(), uid)
 	text = f"""{lst['javapath']}\\bin\\javaw.exe 
 -XX:+UseConcMarkSweepGC 
 -XX:-UseAdaptiveSizePolicy 
