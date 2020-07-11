@@ -31,6 +31,7 @@ root.geometry(f"{width}x{height}+{x}+{y}")
 Label(text="ForgeOptiFine 1.7.10", font="Arial 12", fg="red").grid(row=0, column=0, pady=10, padx=10)
 Label(text="PyLauncher by Adxamjon97", font="Arial 15").grid(row=0, column=1, pady=10, padx=10)
 
+# 2-ой строка
 Label(text="Путь на папку клента: ", font="Arial 12").grid(row=1, column=0, pady=10, padx=10)
 
 clentpath = StringVar()
@@ -45,6 +46,7 @@ def clentdirpath():
 Entry(width=55, textvariable=clentpath).grid(row=1, column=1, pady=10, padx=10)
 Button(text="...", width=3, height=1, command=clentdirpath).grid(row=1, column=3, pady=10, padx=10)
 
+# 3-ый строка
 Label(root, text="Путь на папку джава: ", font="Arial 12").grid(row=2, column=0, pady=10, padx=10)
 
 javapath = StringVar()
@@ -59,6 +61,7 @@ def javadirpath():
 Entry(width=55, textvariable=javapath).grid(row=2, column=1, pady=10, padx=10)
 Button(text="...", width=3, height=1, command=javadirpath).grid(row=2, column=3, pady=10, padx=10)
 
+# 4-ый строка
 maxmb = StringVar()
 if lst == {} or lst['maxmb'] == '': maxmb.set('1600')
 else: maxmb.set(lst['maxmb'])
@@ -66,6 +69,7 @@ else: maxmb.set(lst['maxmb'])
 Label(text="Память: ", font="Arial 12").grid(row=3, column=0, pady=10, padx=10)
 Entry(width=25, textvariable=maxmb).grid(row=3, column=1, pady=10, padx=10)
 
+# 5-ый строка
 username = StringVar()
 if lst == {} or lst['username'] == '': username.set('noname')
 else: username.set(lst['username'])
@@ -73,7 +77,7 @@ else: username.set(lst['username'])
 Label(text="Имя игрока: ", font="Arial 12").grid(row=4, column=0, pady=10, padx=10)
 Entry(width=25, textvariable=username).grid(row=4, column=1, pady=10, padx=10)
 
-
+# 6-ой строка
 def save():
 	global lst
 	uid = str(uuid.uuid1()).replace('-','')
@@ -94,8 +98,6 @@ def save():
 		print('error of dumps')
 	finally:
 		file.close()
-
-
 
 Button(text="Сохранения",  width=12, height=1, command=save).grid(row=5, column=0, pady=10, padx=10)
 
