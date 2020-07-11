@@ -1,22 +1,28 @@
 from tkinter import *
 from tkinter import filedialog
+# from PIL import ImageTk,Image
 
 import json
 import uuid
 import subprocess as sp
 
+from threading import Thread
+import time
+
+# открыть джисон файл
 lst = {}
 config = "PyConfig.json"
 try:
 	file = open(config, 'r')
-	lst = json.loads(''.join([line for line in file]))
+	lst = json.loads(''.join([line for line in file])) # взять как славарь
 except Exception as e:
-	file = open(config, 'w')
+	file = open(config, 'w') # если нет то заздадим
 	file.write = r'w'
 finally:
 	file.close()
 
-root = Tk(__name__)
+# начать рисовать на окно
+root = Tk()
 
 width  = 590 # размер окна
 height = 280
@@ -24,71 +30,57 @@ height = 280
 x = int(root.winfo_screenwidth()//2  - width/2) # середина экрана
 y = int(root.winfo_screenheight()//2 - height/2)
 
-root.title("PyLauncher")
-root.resizable(False, False) 
-root.geometry(f"{width}x{height}+{x}+{y}")
+root.title("PyLauncher") 
+root.resizable(False, False) # размер не изменяемый 
+root.geometry(f"{width}x{height}+{x}+{y}") # размер экрана
 
-Label(text="ForgeOptiFine 1.7.10", font="Arial 12", fg="red").grid(row=0, column=0, pady=10, padx=10)
-Label(text="PyLauncher by Adxamjon97", font="Arial 15").grid(row=0, column=1, pady=10, padx=10)
+Label(text="ForgeOptiFine 1.7.10",     font="Arial 12", fg="red").grid(row=0, column=0, pady=10, padx=10)
+Label(text="PyLauncher by Adxamjon97", font="Arial 15"          ).grid(row=0, column=1, pady=10, padx=10)
 
-# 2-ой строка
-Label(text="Путь на папку клента: ", font="Arial 12").grid(row=1, column=0, pady=10, padx=10)
+def path(string, string2, row):
+	Label(text=string2, font="Arial 12").grid(row=row, column=0, pady=10, padx=10)
 
-clentpath = StringVar()
-if lst == {} or lst['clentpath'] == '': clentpath.set(sp.check_output("cd", shell=True)) # str(s)[2:-5].replace(r'\\', '\\')
-else: clentpath.set(lst['clentpath'])
+	var = StringVar()
+	if lst == {} or lst[string] == '': var.set(sp.check_output("cd", shell=True))
+	else: var.set(lst[string])
 
-def clentdirpath():
-	filename = filedialog.askdirectory(initialdir=clentpath.get())
-	if filename != '':
-		clentpath.set(filename.replace('/', '\\'))
+	def func():
+		dirname = filedialog.askdirectory(initialdir=var.get())
+		if dirname != '':
+			var.set(dirname.replace('/', '\\'))
 
-Entry(width=55, textvariable=clentpath).grid(row=1, column=1, pady=10, padx=10)
-Button(text="...", width=3, height=1, command=clentdirpath).grid(row=1, column=3, pady=10, padx=10)
+	Entry(width=55, textvariable=var).grid(row=row, column=1, pady=10, padx=10)
+	Button(text="...", width=3, height=1, command=func).grid(row=row, column=3, pady=10, padx=10)
+	return var
 
-# 3-ый строка
-Label(root, text="Путь на папку джава: ", font="Arial 12").grid(row=2, column=0, pady=10, padx=10)
+clentpath = path('clentpath', "Путь на папку клента: ", 1) # 2-ой строка
+javapath  = path('javapath',  "Путь на папку джава: ",  2)  # 3-ый строка
 
-javapath = StringVar()
-if lst == {} or lst['javapath'] == '': javapath.set(sp.check_output("cd", shell=True)) # str(s)[2:-5].replace(r'\\', '\\')
-else: javapath.set(lst['javapath'])
+def mbandname(string, string2, default, row):
+		var = StringVar()
 
-def javadirpath():
-	filename = filedialog.askdirectory(initialdir=javapath.get())
-	if filename != '':
-		javapath.set(filename.replace('/', '\\'))
+		if lst == {} or lst[string] == '': var.set(default)
+		else: var.set(lst[string])
 
-Entry(width=55, textvariable=javapath).grid(row=2, column=1, pady=10, padx=10)
-Button(text="...", width=3, height=1, command=javadirpath).grid(row=2, column=3, pady=10, padx=10)
-
-# 4-ый строка
-maxmb = StringVar()
-if lst == {} or lst['maxmb'] == '': maxmb.set('1600')
-else: maxmb.set(lst['maxmb'])
-
-Label(text="Память: ", font="Arial 12").grid(row=3, column=0, pady=10, padx=10)
-Entry(width=25, textvariable=maxmb).grid(row=3, column=1, pady=10, padx=10)
-
-# 5-ый строка
-username = StringVar()
-if lst == {} or lst['username'] == '': username.set('noname')
-else: username.set(lst['username'])
-
-Label(text="Имя игрока: ", font="Arial 12").grid(row=4, column=0, pady=10, padx=10)
-Entry(width=25, textvariable=username).grid(row=4, column=1, pady=10, padx=10)
+		Label(text=string2, font="Arial 12").grid(row=row, column=0, pady=10, padx=10)
+		Entry(width=25, textvariable=var).grid(row=row, column=1, pady=10, padx=10)
+		return var
+		
+maxmb    = mbandname('maxmb',    "Память: ",     '1600',   3) # 3-ый строка
+username = mbandname('username', "Имя игрока: ", 'noname', 4) # 4-ый строка
 
 # 6-ой строка
 def save():
 	global lst
 	uid = str(uuid.uuid1()).replace('-','')
 	lst = {
-		"username" :  username.get(),
-		"clentpath" : clentpath.get(),
-		"javapath" :  javapath.get(),
-		"maxmb" : maxmb.get(),
-		"uuid" : uid,
+		"username" :    username.get(),
+		"clentpath" :   clentpath.get(),
+		"javapath" :    javapath.get(),
+		"maxmb" :       maxmb.get(),
+		"uuid" :        uid,
 		"accessToken" : uid,
-		"scobe" : r'{}'
+		"scobe" :       r'{}'
 	}
 
 	try:
@@ -101,9 +93,9 @@ def save():
 
 Button(text="Сохранения",  width=12, height=1, command=save).grid(row=5, column=0, pady=10, padx=10)
 
-def start():
+def start(obj):
 	save()
-	text = ''.join(f"""{lst['javapath']}\\bin\\javaw.exe 
+	text = f"""{lst['javapath']}\\bin\\javaw.exe 
 -XX:+UseConcMarkSweepGC 
 -XX:-UseAdaptiveSizePolicy 
 -XX:+CMSParallelRemarkEnabled 
@@ -179,16 +171,23 @@ def start():
 --tweakClass cpw.mods.fml.common.launcher.FMLTweaker 
 --tweakClass optifine.OptiFineForgeTweaker 
 --width 925 
---height 530""".split('\n'))
-	# print(text)
-	sp.call(text)
-	root.destroy()
+--height 530"""
+	command = ''.join(text.split('\n')) # убрать новый строкы
+		
+	obj['state'] = 'disabled'
+	obj['text']  = 'запускается'
 
+	def fun():
+		time.sleep(3)
+		root.destroy() # закрыть лаунчера
+	Thread(target=fun).start()
 
-Button(text="Запускать", width=20, height=1, command=start).grid(row=5, column=1, pady=10, padx=10)
+	def fun2():
+		sp.call(command) # запуск команду
+	Thread(target=fun2).start()
+
+btn2 = Button(text="Запускать", width=20, height=1, command=lambda: start(btn2))
+btn2.grid(row=5, column=1, pady=10, padx=10)
 
 root.mainloop()
-
-
-
 
